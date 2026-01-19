@@ -1,11 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PLAYER_COUNT } from '../logic/MatchManager';
 import './Setup.css';
+import Notifications from './Notifications';
 
-const Setup = ({ onStart, onViewHistory }) => {
+const Setup = ({ onStart, onViewHistory, onViewTracker, user, onLogout }) => {
     const [playerCount, setPlayerCount] = useState(PLAYER_COUNT.TWO);
     const [team1Names, setTeam1Names] = useState(['']);
     const [team2Names, setTeam2Names] = useState(['']);
+    const [showNotifications, setShowNotifications] = useState(false);
+    const [pendingCount, setPendingCount] = useState(0);
+
+    // Check for notifications periodically or on mount
+    useEffect(() => {
+        const checkNotifications = () => {
+            try {
+                const saved = localStorage.getItem('tennis_reservations');
+                const reservations = saved ? JSON.parse(saved) : [];
+
+                let count = 0;
+                reservations.forEach(res => {
+                    if (res.user === user.name && res.requests) {
+                        count += res.requests.filter(r => r.status === 'pending').length;
+                    }
+                });
+                setPendingCount(count);
+            } catch (e) {
+                setPendingCount(0);
+            }
+        };
+
+        checkNotifications();
+        // Poll every 2 seconds to act as "live" updates for demo purposes
+        const interval = setInterval(checkNotifications, 2000);
+        return () => clearInterval(interval);
+    }, [user]);
+
 
     const handlePlayerCountChange = (count) => {
         setPlayerCount(count);
@@ -36,6 +65,24 @@ const Setup = ({ onStart, onViewHistory }) => {
 
     return (
         <div className="setup-container">
+            <div className="profile-header">
+                {user && (
+                    <div className="user-info">
+                        <div className="notification-icon" onClick={() => setShowNotifications(true)}>
+                            🔔
+                            {pendingCount > 0 && <span className="badge">{pendingCount}</span>}
+                        </div>
+                        <img src={user.photo} alt="Profile" className="user-photo" />
+                        <span>{user.firstName || user.name.split(' ')[0]}</span>
+                        <button className="logout-btn" onClick={onLogout} title="Switch Account">Switch Account</button>
+                    </div>
+                )}
+            </div>
+
+            {showNotifications && (
+                <Notifications onClose={() => setShowNotifications(false)} currentUser={user} />
+            )}
+
             <h1>New Match</h1>
 
             <div className="form-section">
@@ -86,6 +133,12 @@ const Setup = ({ onStart, onViewHistory }) => {
                 </button>
                 <button className="start-btn history-btn" style={{ backgroundColor: '#555' }} onClick={onViewHistory}>
                     History
+                </button>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+                <button className="start-btn" style={{ backgroundColor: '#2563eb', width: '100%' }} onClick={onViewTracker}>
+                    🎾 AI Video Tracker
                 </button>
             </div>
 

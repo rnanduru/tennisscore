@@ -1,0 +1,333 @@
+/* Full Page View Wrapper */
+.reservation-view-container {
+    height: 100vh;
+    /* Fallback */
+    height: 100dvh;
+    /* Mobile viewport height */
+    padding: 10px;
+    max-width: 600px;
+    margin: 0 auto;
+
+    /* Tennis Court Background with Dark Overlay */
+    background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url('../assets/bg_clay.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    /* Reduce gap slightly */
+    box-sizing: border-box;
+    /* On mobile, occupy full screen */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 0;
+    overflow: hidden;
+    /* Prevent body scroll */
+}
+
+@media (min-width: 600px) {
+    .reservation-view-container {
+        position: relative;
+        height: auto;
+        max-height: 800px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+}
+
+.view-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.back-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.back-btn:hover {
+    color: var(--accent-primary);
+    text-decoration: underline;
+}
+
+/* Reusing existing compact styles but ensuring they work without modal context */
+/* Compact Row for Court Select */
+.compact-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* Contrast improvements for Clay Background */
+
+.compact-select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.7);
+    /* Darker, more opaque background */
+    color: #fff;
+    font-size: 16px;
+    backdrop-filter: blur(4px);
+}
+
+/* Dates Scroll Area */
+/* Dates Scroll Area - Now fitting on screen */
+.compact-dates {
+    display: flex;
+    overflow-x: hidden;
+    /* Disable scroll if we want them to fit */
+    gap: 4px;
+    /* Tighter gap */
+    padding-bottom: 5px;
+    flex-shrink: 0;
+    width: 100%;
+}
+
+.date-btn {
+    flex: 1;
+    /* Distribute space equally */
+    padding: 6px 2px;
+    /* Minimal padding */
+    border-radius: 8px;
+    /* Square-ish rounded */
+    background: rgba(0, 0, 0, 0.6);
+    /* Semi-transparent dark */
+    color: #ccc;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.75rem;
+    /* Smaller text */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+    min-width: 0;
+    /* Allow shrinking below content size if needed */
+}
+
+.date-btn.active {
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+    font-weight: 600;
+    border-color: transparent;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Scrollable Time Grid */
+.compact-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    overflow-y: auto;
+    flex-grow: 1;
+    /* Take up remaining space */
+    min-height: 0;
+    /* Important for flex scrolling */
+    padding-right: 4px;
+    /* Space for scrollbar */
+}
+
+.time-btn {
+    padding: 4px;
+    border-radius: 6px;
+    background: rgba(30, 30, 30, 0.85);
+    /* More opaque */
+    color: #ddd;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 13px;
+    position: relative;
+    height: 50px;
+    /* Slightly smaller for density */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(2px);
+    line-height: 1.1;
+}
+
+.time-btn:hover:not(:disabled) {
+    border-color: var(--accent-primary);
+    background: rgba(40, 40, 40, 0.95);
+}
+
+.time-btn.active {
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+    border-color: var(--accent-primary);
+    font-weight: bold;
+}
+
+.time-btn.active.start-time {
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.time-btn.active.end-time {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: white;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+.time-btn.active.range-time {
+    background: #10b981;
+    /* Green to match Start */
+    color: white;
+    border-color: #10b981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.time-btn.disabled {
+    background: rgba(0, 0, 0, 0.5);
+    color: #666;
+    border-color: rgba(255, 255, 255, 0.05);
+    cursor: not-allowed;
+}
+
+/* Indicate "Needs Player" slots */
+.time-btn.disabled.needs-player {
+    border-color: #f59e0b;
+    color: #f59e0b;
+    background: rgba(0, 0, 0, 0.8);
+    cursor: pointer;
+}
+
+.res-owner {
+    font-size: 8px;
+    /* Slightly smaller to fit names */
+    opacity: 0.9;
+    margin-top: 2px;
+    font-weight: 500;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 2px;
+}
+
+/* Sticky Footer */
+.footer-action {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 10px;
+    flex-shrink: 0;
+    /* Never shrink */
+    background: rgba(20, 20, 20, 0.95);
+    /* Opaque footer background */
+    margin: 0 -10px -10px -10px;
+    /* Stretch to edges */
+    padding: 10px 15px 10px 15px;
+    /* Add padding back */
+    border-radius: 0 0 0 0;
+    backdrop-filter: blur(5px);
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Join Request Slot */
+.join-request-slot {
+    background: rgba(249, 115, 22, 0.4);
+    /* Orange opacity */
+    cursor: pointer !important;
+    border-color: #f97316;
+    color: white;
+}
+
+.join-request-slot:hover {
+    background: rgba(249, 115, 22, 0.6);
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #fff;
+    /* Ensure text is white */
+    font-weight: 500;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.checkbox-label.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: transparent;
+}
+
+.needed-count-select {
+    padding: 4px;
+    border-radius: 4px;
+    background: #333;
+    color: white;
+    border: 1px solid #555;
+    font-size: 12px;
+}
+
+.compact-helper {
+    font-size: 11px;
+    color: #666;
+    margin: 0;
+    text-align: center;
+}
+
+.compact-btn {
+    width: 100%;
+    /* Full width button */
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+
+.compact-btn:disabled {
+    background: #333;
+    color: #555;
+    cursor: not-allowed;
+}
+
+/* Success View */
+.success-view {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    height: 100dvh;
+}
+
+.success .checkmark {
+    font-size: 48px;
+    color: #10b981;
+    margin-top: 20px;
+}

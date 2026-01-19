@@ -1,0 +1,20 @@
+[
+    {
+        "courtId": 1,
+        "date": "2026-01-18",
+        "startTime": "10:00 AM",
+        "endTime": "11:00 AM",
+        "user": "John Doe",
+        "needsPlayer": false,
+        "requests": [],
+        "joinedPlayers": []
+    },
+    {
+        "courtId": 2,
+        "date": "2026-01-19",
+        "startTime": "09:00 AM",
+        "endTime": "10:00 AM",
+        "user": "Alice Johnson",
+        "needsPlayer": false
+    }
+]
