@@ -93,9 +93,11 @@
     /* Disable scroll if we want them to fit */
     gap: 4px;
     /* Tighter gap */
-    padding-bottom: 5px;
+    padding-bottom: 2px;
     flex-shrink: 0;
     width: 100%;
+    min-height: 50px;
+    /* Force small height */
 }
 
 .date-btn {
@@ -138,8 +140,10 @@
     /* Take up remaining space */
     min-height: 0;
     /* Important for flex scrolling */
-    padding-right: 4px;
+    padding-right: 2px;
     /* Space for scrollbar */
+    padding-bottom: 60px;
+    /* Ensure last item is not hidden behind footer */
 }
 
 .time-btn {
@@ -151,7 +155,9 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
     font-size: 13px;
     position: relative;
-    height: 50px;
+    font-size: 13px;
+    height: 42px;
+    /* Smaller height for mobile density */
     /* Slightly smaller for density */
     display: flex;
     flex-direction: column;

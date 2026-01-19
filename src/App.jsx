@@ -17,7 +17,9 @@ const VIEW = {
 };
 
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from './firebase';
+import { doc, getDoc, setDoc, collection, query, getDocs, limit } from 'firebase/firestore';
+import { auth, db } from './firebase';
+import PendingApproval from './components/PendingApproval';
 
 function App() {
   // Auth State
@@ -34,30 +36,50 @@ function App() {
 
   useEffect(() => {
     // Listen for Firebase Auth changes
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      // If we are already logged out explicitly (user is null), we might want to respect that?
-      // Actually, Firebase's onAuthStateChanged is the source of truth.
-      // If firebaseUser exists, it means we are logged in.
-      // If we clicked logout, signOut() is called, which triggers this callback with null.
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        const appUser = {
-          name: firebaseUser.displayName,
-          firstName: firebaseUser.displayName ? firebaseUser.displayName.split(' ')[0] : 'User',
-          email: firebaseUser.email,
-          photo: firebaseUser.photoURL
-        };
-        setUser(appUser);
-      } else {
-        // Firebase says we are signed out.
-        // We do nothing here, let handleLogout clear the state to be safe, 
-        // OR we can clear it here to ensure sync.
-        // Let's clear it here to ensure if token expires or revoked, we log out.
-        // However, we want to allow "Mock" users to persist.
-        // Mock users don't trigger onAuthStateChanged.
+        try {
+          // Check if user document exists in Firestore
+          const userRef = doc(db, 'users', firebaseUser.uid);
+          const userSnap = await getDoc(userRef);
 
-        // So ONLY clear if the current user was a Firebase user (has email/uid etc)
-        // But for simplicity in this hybrid mode:
-        // We won't auto-clear here to protect Mock logins.
+          let userData;
+
+          if (userSnap.exists()) {
+            userData = userSnap.data();
+          } else {
+            // First time login for this user
+            // Check if this is the FIRST user ever (Global Admin)
+            const q = query(collection(db, 'users'), limit(1));
+            const querySnapshot = await getDocs(q);
+            const isFirstUser = querySnapshot.empty;
+
+            userData = {
+              uid: firebaseUser.uid,
+              name: firebaseUser.displayName || 'Unknown',
+              email: firebaseUser.email,
+              photo: firebaseUser.photoURL,
+              role: isFirstUser ? 'admin' : 'user',
+              status: isFirstUser ? 'approved' : 'pending',
+              createdAt: new Date().toISOString()
+            };
+
+            await setDoc(userRef, userData);
+          }
+
+          const appUser = {
+            ...userData,
+            firstName: userData.name ? userData.name.split(' ')[0] : 'User',
+          };
+          setUser(appUser);
+
+        } catch (error) {
+          console.error("Error fetching/creating user:", error);
+          // Fallback for visual continuity if firestore fails?
+          // For now, let's just log it.
+        }
+      } else {
+        // Logged out
       }
     });
     return () => unsubscribe();
@@ -108,6 +130,10 @@ function App() {
   }
 
   const renderView = () => {
+    if (user && user.status === 'pending') {
+      return <PendingApproval user={user} onLogout={handleLogout} />;
+    }
+
     switch (currentView) {
       case VIEW.SETUP:
         return (
